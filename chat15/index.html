@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دلدار</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:system-ui,"IRANSans",sans-serif
+}
+
+body{
+  background:#f9efe3;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column
+}
+
+.header{
+  padding:16px;
+  background:linear-gradient(135deg,#ff6b81,#ff9a9e);
+  color:#fff
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
+.header-avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:rgba(255,255,255,.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px
+}
+
+.header-title{
+  font-size:18px;
+  font-weight:600
+}
+
+.header-subtitle{
+  margin-top:6px;
+  font-size:14px;
+  opacity:.9;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition:.4s
+}
+
+.typing-dots span{
+  width:6px;
+  height:6px;
+  background:#fff;
+  border-radius:50%;
+  display:inline-block;
+  opacity:.4;
+  animation:blink 1.4s infinite
+}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+
+@keyframes blink{
+  0%,100%{opacity:.3}
+  50%{opacity:1}
+}
+
+.chat-container{
+  flex:1;
+  overflow-y:auto;
+  padding:16px
+}
+
+.chat-inner{
+  display:flex;
+  flex-direction:column;
+  gap:14px
+}
+
+.bubble{
+  max-width:85%;
+  padding:14px 18px;
+  border-radius:22px;
+  background:#dff2ff;
+  font-size:20px;
+  line-height:1.8;
+  box-shadow:0 2px 5px rgba(0,0,0,.12);
+  align-self:flex-start;
+  white-space:pre-wrap;
+  opacity:0;
+  transform:translateY(16px);
+  transition:.6s
+}
+.bubble.show{
+  opacity:1;
+  transform:translateY(0)
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-avatar">❤</div>
+    <div class="header-title">دلدار</div>
+  </div>
+  <div class="header-subtitle" id="status">
+    is typing
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<div class="chat-container" id="chat">
+  <div class="chat-inner" id="chatInner"></div>
+</div>
+
+<script>
+const messages=[
+  "نمی دونم چرا...؟",
+  "اما خیلی از تصمیم هام،",
+  "یه جایی تهش"
+];
+
+const lastLine="پای تو وسطه ";
+
+let index=0;
+const chat=document.getElementById("chat");
+const chatInner=document.getElementById("chatInner");
+const status=document.getElementById("status");
+
+function scrollBottom(){
+  chat.scrollTo({top:chat.scrollHeight,behavior:"smooth"});
+}
+
+function addTextBubble(text){
+  const b=document.createElement("div");
+  b.className="bubble";
+  b.textContent=text;
+  chatInner.appendChild(b);
+  setTimeout(()=>b.classList.add("show"),100);
+  scrollBottom();
+}
+
+function typeLastBubble(){
+  const b=document.createElement("div");
+  b.className="bubble show";
+  chatInner.appendChild(b);
+
+  let textIndex=0;
+
+  // تایپ متن اصلی
+  const typeMain=setInterval(()=>{
+    b.textContent+=lastLine[textIndex++];
+    scrollBottom();
+
+    if(textIndex>=lastLine.length){
+      clearInterval(typeMain);
+      setTimeout(typeSmileyStart,500);
+    }
+  },120);
+
+  function typeSmileyStart(){
+    let temp="))";
+    let i=0;
+    const t=setInterval(()=>{
+      b.textContent+=temp[i++];
+      scrollBottom();
+      if(i>=temp.length){
+        clearInterval(t);
+        setTimeout(eraseSmiley,500);
+      }
+    },140);
+  }
+
+  function eraseSmiley(){
+    let count=2;
+    const e=setInterval(()=>{
+      b.textContent=b.textContent.slice(0,-1);
+      scrollBottom();
+      if(--count<=0){
+        clearInterval(e);
+        setTimeout(typeFinalSmiley,400);
+      }
+    },160);
+  }
+
+  function typeFinalSmiley(){
+    const final=":))";
+    let i=0;
+    const f=setInterval(()=>{
+      b.textContent+=final[i++];
+      scrollBottom();
+      if(i>=final.length){
+        clearInterval(f);
+        status.style.opacity=0;
+        setTimeout(()=>status.remove(),600);
+      }
+    },140);
+  }
+}
+
+function next(){
+  if(index<messages.length){
+    addTextBubble(messages[index++]);
+    setTimeout(next,2000+Math.random()*1000);
+  }else{
+    setTimeout(typeLastBubble,2200);
+  }
+}
+
+window.onload=()=>setTimeout(next,1200);
+</script>
+
+</body>
+</html>
