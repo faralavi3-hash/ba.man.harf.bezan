@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>چت دوطرفه</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"IRANSans",sans-serif}
+body{
+  background:#f9efe3;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column
+}
+
+/* header */
+.header{
+  padding:16px;
+  background:linear-gradient(135deg,#ff6b81,#ff9a9e);
+  color:#fff
+}
+.header-title{font-size:18px;font-weight:600}
+.header-subtitle{
+  margin-top:6px;
+  font-size:14px;
+  opacity:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  transition:.3s
+}
+
+/* typing dots (header) */
+.typing-dots span{
+  width:6px;height:6px;background:#fff;border-radius:50%;
+  display:inline-block;opacity:.4;animation:blink 1.6s infinite
+}
+.typing-dots span:nth-child(2){animation-delay:.3s}
+.typing-dots span:nth-child(3){animation-delay:.6s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* chat */
+.chat-container{
+  flex:1;
+  padding:16px;
+  overflow:hidden
+}
+.chat-inner{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* bubbles */
+.bubble{
+  max-width:75%;
+  padding:16px 20px;
+  border-radius:22px;
+  font-size:18px;
+  line-height:2;
+  opacity:0;
+  transform:translateY(16px);
+  transition:1.2s ease
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+/* sides */
+.right{align-self:flex-end;background:#dff2ff}
+.left{align-self:flex-start;background:#dcf8c6}
+
+/* ❤️ delbar – قرمز + ضربان نوری (فقط محو/ظاهر، بدون حرکت) */
+.delbar{
+  color:#D94A5A;
+  font-weight:500;
+  animation:heartFade 3.8s ease-in-out forwards;
+}
+@keyframes heartFade{
+  0%{opacity:0}
+  15%{opacity:1}
+  30%{opacity:.45}
+  45%{opacity:1}
+  60%{opacity:.5}
+  75%{opacity:1}
+  100%{opacity:1}
+}
+
+/* send */
+.send-bar{
+  padding:12px;
+  background:#fff;
+  border-top:1px solid #ddd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px
+}
+.hint{
+  font-size:14px;
+  color:#777;
+  user-select:none;
+}
+.send-btn{
+  width:54px;height:54px;border-radius:50%;
+  background:#ff6b81;color:#fff;border:none;
+  font-size:22px;cursor:pointer
+}
+.send-btn:active{transform:scale(.92)}
+.send-btn:disabled{opacity:.4;cursor:default}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="header-title">دلدار</div>
+  <div class="header-subtitle" id="typing">
+    is typing
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div class="chat-container">
+  <div class="chat-inner" id="chatInner"></div>
+</div>
+
+<div class="send-bar">
+  <div class="hint">برای ارسال پیام لمس کن</div>
+  <button class="send-btn" id="sendBtn">➤</button>
+</div>
+
+<script>
+var chatInner = document.getElementById("chatInner");
+var typing = document.getElementById("typing");
+var sendBtn = document.getElementById("sendBtn");
+
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function showTyping(){ typing.style.opacity = 1; }
+function hideTyping(){ typing.style.opacity = 0; }
+
+function addBubble(text, side, extraClass){
+  return new Promise(function(resolve){
+    var b = document.createElement("div");
+    b.className = "bubble " + side + (extraClass ? (" " + extraClass) : "");
+    b.textContent = text;
+    chatInner.appendChild(b);
+    setTimeout(function(){
+      b.classList.add("show");
+      resolve(b);
+    }, 400);
+  });
+}
+
+/* متن‌ها */
+var userText = "چه خبر؟";
+var deldarTexts = [
+  "هیچ خبری،",
+  "قشنگ تر از ",
+  "\"بودنت\" نیست...."
+];
+
+function typingDelay(text){
+  var ms = 900 + (text.length * 25);
+  if(ms > 3500) ms = 3500;
+  return ms;
+}
+
+var started = false;
+
+async function runChat(){
+  sendBtn.disabled = true;
+
+  await addBubble(userText, "left");
+  await wait(900);
+
+  for(var i=0; i<deldarTexts.length; i++){
+    showTyping();
+    await wait(typingDelay(deldarTexts[i]));
+    hideTyping();
+
+    await addBubble(deldarTexts[i], "right");
+    await wait(900);
+  }
+
+  // سه نقطه تدریجی + حذف امن (بدون گیر کردن)
+  showTyping();
+  var dots = await addBubble("•", "right");
+  await wait(700);
+  dots.textContent = "• •";
+  await wait(700);
+  dots.textContent = "• • •";
+  await wait(900);
+
+  dots.style.opacity = "0";
+  await wait(700);
+  dots.style.display = "none";   // امن‌تر از removeChild در اپتو
+
+  // دلبرررر نرم + قرمز + ضربان نوری
+  await addBubble("دلبرررر …", "right", "delbar");
+  hideTyping();
+
+  sendBtn.disabled = false;
+}
+
+sendBtn.addEventListener("click", function(){
+  if(started) return;
+  started = true;
+  runChat();
+});
+
+window.onload = function(){
+  hideTyping();
+};
+</script>
+
+</body>
+</html>
