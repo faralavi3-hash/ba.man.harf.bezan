@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دلدار</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"IRANSans",sans-serif}
+body{
+  background:#f9efe3;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column
+}
+
+/* header */
+.header{
+  padding:16px;
+  background:linear-gradient(135deg,#ff6b81,#ff9a9e);
+  color:#fff
+}
+.header-title{font-size:18px;font-weight:600}
+.header-subtitle{
+  margin-top:6px;
+  font-size:14px;
+  opacity:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* typing */
+.typing-dots span{
+  width:6px;height:6px;background:#fff;border-radius:50%;
+  display:inline-block;opacity:.4;animation:blink 1.6s infinite
+}
+.typing-dots span:nth-child(2){animation-delay:.3s}
+.typing-dots span:nth-child(3){animation-delay:.6s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* chat */
+.chat-container{flex:1;padding:16px;overflow:hidden}
+.chat-inner{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  transition:opacity .7s ease
+}
+.chat-inner.fade{opacity:0}
+
+/* bubbles */
+.bubble{
+  max-width:75%;
+  padding:18px 22px;
+  border-radius:24px;
+  font-size:18px;
+  line-height:2.2;
+  opacity:0;
+  transform:translateY(12px);
+  transition:1.3s
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+
+.right{align-self:flex-end;background:#dff2ff}
+.left{align-self:flex-start;background:#dcf8c6}
+
+/* send */
+.send-bar{
+  padding:12px;
+  background:#fff;
+  border-top:1px solid #ddd;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px
+}
+.hint{
+  font-size:14px;
+  color:#777;
+  user-select:none;
+}
+.send-btn{
+  width:54px;height:54px;border-radius:50%;
+  background:#ff6b81;color:#fff;border:none;
+  font-size:22px;cursor:pointer
+}
+.send-btn:disabled{opacity:.35}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="header-title">دلدار</div>
+  <div class="header-subtitle" id="typing">
+    is typing
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div class="chat-container">
+  <div class="chat-inner" id="chat"></div>
+</div>
+
+<div class="send-bar">
+  <div class="hint">برای ارسال پیام لمس کن</div>
+  <button class="send-btn" id="send" disabled>➤</button>
+</div>
+
+<script>
+var chat = document.getElementById("chat");
+var typing = document.getElementById("typing");
+var send = document.getElementById("send");
+
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function showTyping(){ typing.style.opacity=1; }
+function hideTyping(){ typing.style.opacity=0; }
+
+function add(text,side){
+  return new Promise(r=>{
+    var b=document.createElement("div");
+    b.className="bubble "+side;
+    b.textContent=text;
+    chat.appendChild(b);
+    setTimeout(()=>{b.classList.add("show");r()},650);
+  });
+}
+
+async function clearPage(){
+  chat.classList.add("fade");
+  await wait(900);
+  chat.innerHTML="";
+  chat.classList.remove("fade");
+  await wait(300);
+}
+
+/* ───────── سناریو ───────── */
+
+async function page1(){
+  showTyping();
+  await wait(2600);
+  await add("عزیز دلم،","right");
+  await wait(1600);
+  await add("روزت چطور بود؟","right");
+  hideTyping();
+
+  send.disabled=false;
+}
+
+async function user1(){
+  send.disabled=true;
+  await add("راستش...","left");
+  await wait(1500);
+  await add("روز جالبی نداشتم :(","left");
+
+  showTyping();
+  await wait(2800);
+  await add("می خوای بیشتر بگی؟","right");
+  hideTyping();
+
+  await wait(2200);
+  await clearPage();
+  page2();
+}
+
+async function page2(){
+  send.disabled=false;
+}
+
+async function user2(){
+  send.disabled=true;
+  await add("چیزی نیست..","left");
+  await wait(1500);
+  await add("فقط بعضی وقتا..","left");
+  await wait(1500);
+  await add("زورم به غصه هام نمی رسه....","left");
+
+  showTyping();
+  await wait(3200);
+  await add("جان دلم..","right");
+  await wait(1600);
+  await add("انقدر حال خوب هست","right");
+  await wait(1500);
+  await add("که هنوز تجربه نکردی..","right");
+  hideTyping();
+
+  await wait(2600);
+  await clearPage();
+  page3();
+}
+
+async function page3(){
+  showTyping();
+  await wait(3000);
+  await add(".. انقدر شادی هست که","right");
+  await wait(1500);
+  await add("هنوز وارد زندگیت نشده..","right");
+  await wait(1500);
+  await add(".. انقدر راه تازه هست که","right");
+  await wait(1500);
+  await add("هنوز قدم نذاشتی..","right");
+  await wait(1500);
+  await add("..انقدر آدم خوب هست که","right");
+  await wait(1500);
+  await add("هنوز وارد زندگیت نشده..","right");
+  hideTyping();
+
+  await wait(2600);
+  await clearPage();
+  page4();
+}
+
+async function page4(){
+  showTyping();
+  await wait(3000);
+  await add("..انقدر خنده از ته دل","right");
+  await wait(1500);
+  await add("هست که هنوز نداشتی..","right");
+  await wait(1500);
+  await add("و..","right");
+  await wait(1500);
+  await add("انقدر زندگی هست که","right");
+  await wait(1500);
+  await add("هنوز زندگیش نکردی..","right");
+  await wait(1800);
+  await add("غصه چرا؟","right");
+  hideTyping();
+
+  await wait(2800);
+  await clearPage();
+  page5();
+}
+
+async function page5(){
+  showTyping();
+  await wait(3000);
+  await add("تازه؛","right");
+  await wait(1600);
+  await add("منم که همیشه کنارتم :))","right");
+  hideTyping();
+
+  send.disabled=false;
+}
+
+async function user3(){
+  send.disabled=true;
+  await add("باعث میشی..","left");
+  await wait(1500);
+  await add("غمامو فراموش کنم..","left");
+  await wait(1500);
+  await add("چقدر خوبه که هستی..","left");
+  await wait(1500);
+  await add("..همین..","left");
+}
+
+/* کنترل دکمه */
+var step=0;
+send.onclick=async function(){
+  if(step===0){ step=1; user1(); }
+  else if(step===1){ step=2; user2(); }
+  else if(step===2){ step=3; user3(); }
+};
+
+hideTyping();
+page1();
+</script>
+
+</body>
+</html>
