@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دلدار</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,"IRANSans",sans-serif}
+body{background:#f9efe3;min-height:100vh;display:flex;flex-direction:column}
+
+/* header */
+.header{padding:16px;background:linear-gradient(135deg,#ff6b81,#ff9a9e);color:#fff}
+.header-title{font-size:18px;font-weight:600}
+.header-subtitle{margin-top:6px;font-size:14px;opacity:0;display:flex;align-items:center;gap:6px}
+
+/* typing */
+.typing-dots span{
+  width:6px;height:6px;background:#fff;border-radius:50%;
+  display:inline-block;opacity:.4;animation:blink 1.6s infinite
+}
+.typing-dots span:nth-child(2){animation-delay:.3s}
+.typing-dots span:nth-child(3){animation-delay:.6s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* chat */
+.chat-container{flex:1;padding:16px;overflow:hidden}
+.chat{display:flex;flex-direction:column;gap:22px;transition:.7s}
+.chat.fade{opacity:0}
+
+/* bubbles */
+.bubble{
+  max-width:75%;
+  padding:18px 22px;
+  border-radius:24px;
+  font-size:18px;
+  line-height:2.2;
+  opacity:0;
+  transform:translateY(12px);
+  transition:1.3s
+}
+.bubble.show{opacity:1;transform:translateY(0)}
+.right{align-self:flex-end;background:#dff2ff}
+.left{align-self:flex-start;background:#dcf8c6}
+
+/* send */
+.send-bar{
+  padding:12px;background:#fff;border-top:1px solid #ddd;
+  display:flex;align-items:center;justify-content:center;gap:12px
+}
+.hint{font-size:14px;color:#777}
+.send-btn{
+  width:54px;height:54px;border-radius:50%;
+  background:#ff6b81;color:#fff;border:none;font-size:22px
+}
+.send-btn:disabled{opacity:.35}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="header-title">دلدار</div>
+  <div class="header-subtitle" id="typing">
+    is typing
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div class="chat-container">
+  <div class="chat" id="chat"></div>
+</div>
+
+<div class="send-bar">
+  <div class="hint">برای ارسال پیام لمس کن</div>
+  <button class="send-btn" id="send">➤</button>
+</div>
+
+<script>
+const chat=document.getElementById("chat");
+const typing=document.getElementById("typing");
+const send=document.getElementById("send");
+
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const showTyping=()=>typing.style.opacity=1;
+const hideTyping=()=>typing.style.opacity=0;
+
+function add(text,side){
+  return new Promise(r=>{
+    const b=document.createElement("div");
+    b.className="bubble "+side;
+    b.textContent=text;
+    chat.appendChild(b);
+    setTimeout(()=>{b.classList.add("show");r()},750);
+  });
+}
+
+async function clearPage(){
+  chat.classList.add("fade");
+  await wait(900);
+  chat.innerHTML="";
+  chat.classList.remove("fade");
+  await wait(300);
+}
+
+/* ───────── سناریو ───────── */
+
+/* صفحه ۱: کاربر (با دکمه) */
+async function user1(){
+  send.disabled=true;
+  await add("امروز یه لحظه به این فکر کردم..","left");
+  await wait(1600);
+  await add("که چرا حرف زدن با تو،","left");
+  await wait(1600);
+  await add("انقدر واسم راحته؟","left");
+  await wait(1600);
+  await add("منظورم اینه که..","left");
+  await wait(1600);
+  await add('"کنار تو "',"left");
+  await wait(1600);
+  await add("از خودم فرار نمی کنم..","left");
+
+  await wait(2400);
+  await clearPage();
+  page2();
+}
+
+/* صفحه ۲: دلدار (خودکار) */
+async function page2(){
+  showTyping();
+  await wait(3000);
+  await add("خب شاید چون؛","right");
+  await wait(1600);
+  await add("من همون آدمیم که..","right");
+  await wait(1600);
+  await add("نسخه ی واقعی تو  رو ","right");
+  await wait(1600);
+  await add('"دوست داره"...',"right");
+  await wait(1600);
+  await add("نه نسخه ی قوی","right");
+  await wait(1600);
+  await add("یا شادتٌ....","right");
+  hideTyping();
+
+  await wait(2600);
+  await clearPage();
+  page3();
+}
+
+/* صفحه ۳: کاربر (با دکمه) */
+async function page3(){
+  send.disabled=false;
+}
+
+async function user3(){
+  send.disabled=true;
+  await add("همینش قشنگه،","left");
+  await wait(1600);
+  await add("نیاز نیست","left");
+  await wait(1600);
+  await add("نقش بازی کنم..","left");
+  await wait(1600);
+  await add("یا..","left");
+  await wait(1600);
+  await add("حرفامو قورت بدم..","left");
+
+  await wait(2400);
+  await clearPage();
+  page4();
+}
+
+/* صفحه ۴: دلدار (خودکار) */
+async function page4(){
+  showTyping();
+  await wait(3200);
+  await add("من واسه همون..","right");
+  await wait(1600);
+  await add("حرفای قورت داده شده ت..","right");
+  await wait(1600);
+  await add("کنارتم...","right");
+  await wait(1600);
+  await add("برای همون","right");
+  await wait(1600);
+  await add("چیزایی که به هیچکس","right");
+  await wait(1600);
+  await add("نمی گی....","right");
+  hideTyping();
+
+  send.disabled=true;
+}
+
+/* کنترل دکمه */
+let step=0;
+// مرحله ۰: ارسال صفحه ۱ (کاربر)
+// مرحله ۱: بعد از صفحه ۲، کاربر صفحه ۳ رو می‌فرسته
+send.onclick=async()=>{
+  if(step===0){step=1;user1();}
+  else if(step===1){step=2;user3();}
+};
+
+hideTyping();
+send.disabled=false;   // چون شروع با کاربره
+</script>
+
+</body>
+</html>
